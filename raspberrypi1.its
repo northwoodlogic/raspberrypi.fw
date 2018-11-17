@@ -1,0 +1,61 @@
+/dts-v1/;
+
+/ {
+	description = "RPI-B";
+	#address-cells = <1>;
+
+	images {
+		kernel@1 {
+			data = /incbin/("kernel/arch/arm/boot/zImage");
+			type = "kernel";
+			arch = "arm";
+			os = "linux";
+			compression = "none";
+			load = <0x00080000>;
+			entry = <0x00080000>;
+			hash@1 {
+				algo = "md5";
+			};
+		};
+		fdt@1 {
+			description = "rpi-b";
+			data = /incbin/("kernel/arch/arm/boot/dts/bcm2835-rpi-b-rev2.dtb");
+			type = "flat_dt";
+			arch = "arm";
+			compression = "none";
+			hash@1 {
+				algo = "md5";
+			};
+		};
+		fdt@2 {
+			description = "rpi-b-plus";
+			data = /incbin/("kernel/arch/arm/boot/dts/bcm2835-rpi-b-plus.dtb");
+			type = "flat_dt";
+			arch = "arm";
+			compression = "none";
+			hash@1 {
+				algo = "md5";
+			};
+		};
+		ramdisk@1 {
+			data = /incbin/("initrd.gz");
+			type = "ramdisk";
+			arch = "arm";
+			os = "linux";
+			load = <0x002700000>;
+			entry = <0x002700000>;
+			compression = "gzip";
+			hash@1 {
+				algo = "md5";
+			};
+		};
+	};
+	configurations {
+		b-plus@1 {
+			fdt = "fdt@2";
+			kernel = "kernel@1";
+			ramdisk = "ramdisk@1";
+		};
+	};
+};
+

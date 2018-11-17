@@ -4,3 +4,6 @@
 [submodule "toolchain"]
 	path = toolchain
 	url = git@github.com:northwoodlogic/buildroot.git
+[submodule "kernel"]
+	path = kernel
+	url = git@github.com:northwoodlogic/linux-raspberrypi.git
