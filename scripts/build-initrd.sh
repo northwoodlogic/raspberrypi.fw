@@ -26,7 +26,7 @@ mkdir -p ${INITRD_FS}
 		CROSS_COMPILE=${CROSS_COMPILE} \
 		INSTALL_MOD_PATH=${INITRD_FS} modules_install
 
-	MODULES="$(find lib/modules)"
+	MODULES="$(find lib/modules -name *.ko)"
 	for m in ${MODULES} ; do
 		${CROSS_COMPILE}strip --strip-debug ${m} || true
 	done

@@ -51,6 +51,12 @@
 		};
 	};
 	configurations {
+		b-rev2@1 {
+			fdt = "fdt@1";
+			kernel = "kernel@1";
+			ramdisk = "ramdisk@1";
+		};
+
 		b-plus@1 {
 			fdt = "fdt@2";
 			kernel = "kernel@1";

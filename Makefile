@@ -1,5 +1,12 @@
-FWIMAGE            = raspberrypi1.fw
-FWIMAGE_SRC        = raspberrypi1.its
+
+ifeq ($(WITH_PURPLE_BOARD),1)
+BOARD = purple
+else
+BOARD = vanilla
+endif
+
+FWIMAGE            = rpi-$(BOARD).fw
+FWIMAGE_SRC        = rpi-$(BOARD).its
 
 NO_CLEAN          ?= 0
 BR_PATH           ?= ./toolchain
@@ -18,7 +25,7 @@ TC_PATH := $(shell realpath $(BR_PATH)/output/host/bin)
 CROSS_ARCH    ?=arm
 CROSS_COMPILE ?=$(TC_PATH)/arm-northwoodlogic-linux-gnueabihf-
 
-all: $(UBOOT_BIN)
+all: $(FWIMAGE) $(UBOOT_BIN)
 #
 $(FWIMAGE) : $(INITRD) $(KERNEL_BIN)
 	PATH=$(TC_PATH):$(PATH) $(TC_PATH)/mkimage -f $(FWIMAGE_SRC) $(FWIMAGE)
