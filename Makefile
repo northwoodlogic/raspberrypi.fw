@@ -1,4 +1,7 @@
 
+# Default to building RPI1
+RPI_VERSION ?= 1
+
 ifeq ($(WITH_PURPLE_BOARD),1)
 BOARD = purple
 else
@@ -12,10 +15,29 @@ NO_CLEAN          ?= 0
 BR_PATH           ?= ./toolchain
 ROOT_ARCHIVE      ?= $(BR_PATH)/output/images/rootfs.tar.gz
 UBOOT_BIN         ?= u-boot/u-boot.bin
-UBOOT_DEFCONF     ?= rpi_defconfig
 TOOLCHAIN_DEFCONF ?= northwoodlogic_armv6_defconfig
-KERNEL_DEFCONF    ?= northwoodlogic_bcmrpi_defconfig
 KERNEL_BIN        ?= kernel/arch/arm/boot/zImage
+
+# RPI 1, 2, & 3 use different configs for uboot & kernel.
+ifeq ($(RPI_VERSION),1)
+UBOOT_DEFCONF     ?= rpi_defconfig
+KERNEL_DEFCONF    ?= northwoodlogic_bcmrpi_defconfig
+endif
+
+# My RPI2 kernel config isn't customized yet. bcm2709 is the default
+# from the raspberry pi foundation
+ifeq ($(RPI_VERSION),2)
+UBOOT_DEFCONF     ?= rpi_2_defconfig
+KERNEL_DEFCONF    ?= bcm2709_defconfig
+#KERNEL_DEFCONF    ?= northwoodlogic_bcmrpi2_defconfig
+endif
+
+# RPI3 kernel in 32bit mode (which we're using) is the same kernel
+# config as the RPI2.
+ifeq ($(RPI_VERSION),3)
+UBOOT_DEFCONF     ?= rpi_3_defconfig
+KERNEL_DEFCONF    ?= bcm2709_defconfig
+endif
 
 INITRD            ?= initrd.gz
 
