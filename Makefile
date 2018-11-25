@@ -28,15 +28,14 @@ endif
 # from the raspberry pi foundation
 ifeq ($(RPI_VERSION),2)
 UBOOT_DEFCONF     ?= rpi_2_defconfig
-KERNEL_DEFCONF    ?= bcm2709_defconfig
-#KERNEL_DEFCONF    ?= northwoodlogic_bcmrpi2_defconfig
+KERNEL_DEFCONF    ?= northwoodlogic_bcm2709_defconfig
 endif
 
 # RPI3 kernel in 32bit mode (which we're using) is the same kernel
 # config as the RPI2.
 ifeq ($(RPI_VERSION),3)
-UBOOT_DEFCONF     ?= rpi_3_defconfig
-KERNEL_DEFCONF    ?= bcm2709_defconfig
+UBOOT_DEFCONF     ?= rpi_3_32b_defconfig
+KERNEL_DEFCONF    ?= northwoodlogic_bcm2709_defconfig
 endif
 
 INITRD            ?= initrd.gz

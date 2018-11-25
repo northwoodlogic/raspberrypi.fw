@@ -33,6 +33,16 @@ The config.txt has a single line indicating to load uboot as the kernel
     kernel=u-boot.bin
 
 
+Or, when running on a rpi3 with the mini-uart mapped as the console.
+
+    / # cat /boot/config.txt
+    kernel=u-boot.bin
+    enable_uart=1
+
+Be sure to add "8250.nr_uarts=1 console=ttyS0,115200" to the kernel
+command line.
+
+
 
 U-Boot fit configuration
 ------------------------

@@ -20,6 +20,7 @@ mkdir -p ${INITRD_FS}
 (
 	cd ${INITRD_FS}
 	tar -xf ${ROOT_ARCHIVE}
+#	tar -cf - -C ${HERE}/overlay/ . | tar -xvf - --no-same-owner
 
 	make -C ${HERE}/kernel \
 		ARCH=${ARCH} \
