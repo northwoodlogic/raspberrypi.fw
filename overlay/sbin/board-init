@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# System startup, raspberry.fw style...
+
+# 1)
+# Mount /boot read only, this is the same partition that holds uboot &
+# the rest of the firmware. It will be located at /dev/mmcblk0p1
+#
+# 2)
+# Import the SQL settings file, if it exists. Save imported database
+# to /etc/sys.db.
+#
+# 3)
+# Run override script located in /boot/override if it exists.
+#
+# TODO: Add support for gpio factory reset button. If pin is held during
+# boot flash a LED and restore all default settings.
+
+: ${BOOT_DIR="/boot"}
+: ${BOOT_DEV="/dev/mmcblk0p1"}
+
+if ! [ -e ${BOOT_DEV} ] ; then
+	echo "Boot device: ${BOOT_DEV} does not exist"
+	return 1
+fi
+
+mkdir -p ${BOOT_DIR}
+mount -o ro ${BOOT_DEV} ${BOOT_DIR}
+
+if [ -e "${BOOT_DIR}/cfg/override" ] ; then
+	cp ${BOOT_DIR}/cfg/override /tmp/
+	chmod a+x /tmp/override
+	/tmp/override
+	rm /tmp/override
+fi
+
