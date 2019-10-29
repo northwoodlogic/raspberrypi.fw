@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# The opto22 rpi board has 16 GPIOs wired as follows. It's currently
+# loaded with 16 active low input modules.
+
+# Rack Number | CPU GPIO | Header PIN
+# ------------|----------|-----------
+#           0   21         40
+#           1   26         37
+#           2   20         38
+#           3   19         35
+#           4   16         36
+#           5   13         33
+#           6    6         31
+#           7   12         32
+#           8    5         29
+#           9   25         22
+#          10   24         18
+#          11   22         15
+#          12   23         16
+#          13   27         13
+#          14   17         11
+#          15   4          7
+
+: ${OPTO22_DIR=/var/run/opto22}
+OPTO22_PINS="21 26 20 19 16 13 6 12 5 25 24 22 23 27 17 4"
+
+i=0
+
+mkdir -p ${OPTO22_DIR}
+for p in ${OPTO22_PINS} ; do
+	echo ${p} > /sys/class/gpio/export
+	echo in > /sys/class/gpio/gpio${p}/direction
+	echo 1  > /sys/class/gpio/gpio${p}/active_low
+	ln -sf    /sys/class/gpio/gpio${p}/value ${OPTO22_DIR}/${i}
+	i=$(( i + 1 ))
+done

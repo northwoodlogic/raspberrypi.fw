@@ -1,0 +1,127 @@
+#!/bin/sh
+#
+# $FreeBSD: releng/12.0/libexec/rc/rc.d/sshd 333520 2018-05-12 08:23:17Z des $
+#
+
+# PROVIDE: sshd
+# REQUIRE: LOGIN FILESYSTEMS
+# KEYWORD: shutdown
+
+#. /etc/rc.subr
+
+name="sshd"
+desc="Secure Shell Daemon"
+rcvar="sshd_enable"
+command="/usr/sbin/${name}"
+keygen_cmd="sshd_keygen"
+start_precmd="sshd_precmd"
+reload_precmd="sshd_configtest"
+restart_precmd="sshd_configtest"
+configtest_cmd="sshd_configtest"
+pidfile="/var/run/${name}.pid"
+extra_commands="configtest keygen reload"
+
+: ${sshd_rsa_enable:="yes"}
+: ${sshd_dsa_enable:="yes"}
+: ${sshd_ecdsa_enable:="yes"}
+: ${sshd_ed25519_enable:="yes"}
+
+: ${boot_dir="/boot"}
+
+# restore admin user (root) authorized keys file for remote access.
+admin_keys=${boot_dir}/cfg/admin_keys.pub
+
+# restore sshd config directory if exists
+sshd_arcfg=${boot_dir}/cfg/sshd-config.tar
+
+sshd_keygen_alg()
+{
+	local alg=$1
+	local ALG="$(echo $alg | tr a-z A-Z)"
+	local keyfile
+
+	case $alg in
+	rsa|dsa|ecdsa|ed25519)
+		keyfile="/etc/ssh/ssh_host_${alg}_key"
+		;;
+	*)
+		return 1
+		;;
+	esac
+
+	if [ ! -x /usr/bin/ssh-keygen ] ; then
+		warn "/usr/bin/ssh-keygen does not exist."
+		return 1
+	fi
+
+	if [ -f "${keyfile}" ] ; then
+		echo "$ALG host key exists."
+	else
+		echo "Generating $ALG host key."
+		/usr/bin/ssh-keygen -q -t $alg -f "$keyfile" -N ""
+		/usr/bin/ssh-keygen -l -f "$keyfile.pub"
+	fi
+}
+
+sshd_keygen()
+{
+	sshd_keygen_alg rsa
+	sshd_keygen_alg dsa
+	sshd_keygen_alg ecdsa
+	sshd_keygen_alg ed25519
+}
+
+sshd_configtest()
+{
+	echo "Performing sanity check on ${name} configuration."
+	eval ${command} ${sshd_flags} -t
+}
+
+sshd_adminkeys()
+{
+	mkdir -p  /root/.ssh
+	chmod 700 /root/.ssh
+	if [ -e ${admin_keys} ] ; then
+		cp ${admin_keys} /root/.ssh/authorized_keys
+	fi
+}
+
+sshd_precmd()
+{
+	if [ -e "${sshd_arcfg}" ] ; then
+		tar -xpvf ${sshd_arcfg} -C /
+	fi
+	sshd_keygen
+	sshd_configtest
+	sshd_adminkeys
+}
+
+sshd_sync()
+{
+	mount -o remount,rw ${boot_dir}
+	mkdir -p ${boot_dir}/cfg
+	tar -cpf ${sshd_arcfg} /etc/ssh
+	mount -o remount,ro ${boot_dir}
+}
+
+
+case $1 in
+	start)
+		echo "Starting sshd"
+		sshd_precmd
+		${command}
+		;;
+	stop)
+		echo "Stopping sshd"
+		killall -9 sshd
+		;;
+	sync)
+		echo "Syncing sshd keys"
+		sshd_sync
+		;;
+	*)
+		echo "usage start|stop|sync"
+		exit 1
+		;;
+
+esac

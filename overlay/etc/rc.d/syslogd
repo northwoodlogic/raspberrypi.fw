@@ -1,0 +1,17 @@
+#!/bin/sh
+
+case $1 in
+	start)
+		echo "starting syslogd"
+		killall -9 syslogd > /dev/null 2>&1
+		syslogd -b 10
+		;;
+	stop)
+		echo "stopping syslogd"
+		killall -9 syslogd > /dev/null 2>&1
+		;;
+	*)
+		echo "unhandled option: $1"
+		exit 1
+		;;
+esac

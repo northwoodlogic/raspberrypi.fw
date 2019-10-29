@@ -34,3 +34,17 @@ if [ -e "${BOOT_DIR}/cfg/override" ] ; then
 	rm /tmp/override
 fi
 
+# hostname
+hostname monitor
+
+# bring up management interface, depend on stateless autoconfig.
+ip link set eth0 up
+
+/etc/rc.d/syslogd start
+
+# start sshd, (hopefully)
+/etc/rc.d/sshd start
+
+# configure GPIO, 16 channel G4 rack, active low input modules.
+/etc/rc.d/gpio start in16
+
